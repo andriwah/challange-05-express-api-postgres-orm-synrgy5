@@ -42,15 +42,52 @@ function createHandler(req, res) {
 }
 
 function getAllCarsHandler(req, res) {
-  Cars.findAll({
+  let cond = {
     attributes: ['id', 'name', 'price', 'size', 'image', 'updatedAt'],
-  }).then((cars) => {
-    res.json({
-      status: 'OK',
-      message: 'success retriving data',
-      data: cars,
-    });
+  };
+  console.log('init cond ' + cond);
+  let params = req.query;
+  console.log('params ' + params);
+  if (params.size) {
+    cond.where = { size: params.size };
+    console.log('adding size to cond ' + cond);
+  }
+  Cars.findAll(cond).then((cars) => {
+    if (cars.length > 0) {
+      res.status(200).json({
+        status: 'OK',
+        message: 'success retriving data',
+        data: cars,
+      });
+    } else {
+      res.status(400).json({
+        status: 'Failed',
+        message: 'Data is not available',
+      });
+    }
   });
+}
+
+function findCarHandler(req, res) {
+  Cars.findOne({
+    where: { id: req.params.id },
+  }).then((car) => {
+    if (car !== null) {
+      res.status(200).json({
+        status: 'OK',
+        message: 'Success retrieving data',
+        data: car,
+      });
+    } else {
+      res.status(404).json({
+        status: 'NOT_FOUND',
+        message: 'Car Not Found',
+        data: null,
+      });
+    }
+  });
+
+  return;
 }
 
 function updateCarsHandler(req, res) {
@@ -133,4 +170,5 @@ module.exports = {
   getAllCarsHandler,
   updateCarsHandler,
   deleteCarshandler,
+  findCarHandler,
 };
