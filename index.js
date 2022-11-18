@@ -1,16 +1,15 @@
-// -- Core Module
 const express = require('express');
 const app = express();
+const upload = require('./helpers/uploadCloudinary');
+const controllers = require('./handler/carsHandler');
 
-// -- Upload to Cloud
-const upload = require('./helpers/fileUploadCloudinary');
+const port = process.env.PORT || 8000;
 
-// -- Request and Respons
-const cars_controllers = require('./controllers/carsControllers');
 app.use(express.json());
 
-app.get('/car', cars_controllers.getAll);
-app.post('/car', upload.single('image'), cars_controllers.createCar);
-app.get('/car/:size', cars_controllers.getBySize);
-app.put('/car/:id', cars_controllers.updateById);
-app.delete('/car/:id', cars_controllers.deleteCar);
+app.post('/cars', upload.single('image'), controllers.createHandler);
+app.get('/cars', controllers.getAllCarsHandler);
+app.put('/cars/:id', upload.single('image'), controllers.updateCarsHandler);
+app.delete('/cars/:id', controllers.deleteCarshandler);
+
+app.listen(port, () => console.log(`Listening on http://localhost:${port}`));
